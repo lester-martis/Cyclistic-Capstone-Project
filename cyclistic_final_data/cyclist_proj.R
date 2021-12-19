@@ -94,7 +94,7 @@ cycled
 cycled$date <- as.Date(cycled$date, format = "%d-%m-%Y")
 cycled
 
-# summarizing into monthly data
+# 10. summarizing into monthly data
 library(tidyverse)
 install.packages("lubridate")
 library(lubridate)
@@ -117,6 +117,53 @@ cycled_agg <- cycled %>%
             casual_len = sum(casual_ride_len))
 
 #Now we can see the monthly summary of all variables 
-cycled_agg
+print(cycled_agg)
+
+          ################ STATISTICAL ANALYSIS &  DATA VISUALIZATION ######################
+install.packages("ggplot2")
+library(ggplot2)
 
 
+# 11. The following will explain the basic statistical analysis of different Bike types and 
+# Riders.
+
+  # Daily Avg minutes of Different Riders and Bikes.
+
+cyc_avg_daily <- cycled %>%
+  summarize(date,
+            memb_avg = member_ride_len / member_ride_count,
+            casu_avg = casual_ride_len / casual_ride_count,
+            clas_avg = classic_bike_len / classic_bike_count,
+            elec_avg = electric_bike_len / electric_bike_count,
+            dock_avg = docked_bike_len / docked_bike_count)
+
+print(cyc_avg_daily)
+
+  # Monthly Avg Minutes of different Riders and Bikes.
+
+cyc_avg_mont <- cycled_agg %>%
+  summarize(year_month,
+            memb_avg = member_len / member_count,
+            casu_avg = casual_len / casual_count,
+            clas_avg = classic_len / classic_count,
+            elec_avg = electric_len / electric_count,
+            dock_avg = docked_len / docked_count)
+
+cyc_avg_mont  
+ 
+# Plotting the time series data between Members and Casual Riders
+ggplot(cyc_avg_mont, aes(year_month)) + 
+  geom_line(aes(y = memb_avg, colour = "memb_avg")) + 
+  geom_point(aes(y = memb_avg))+
+  geom_line(aes(y = casu_avg, colour = "casu_avg"))+
+  geom_point(aes(y = casu_avg))
+
+# Plotting the time series data between Different Bike Types
+
+ggplot(cyc_avg_mont, aes(year_month))+
+  geom_line(aes(y = clas_avg, colour = "clas_avg")) + 
+  geom_point(aes(y = clas_avg))+
+  geom_line(aes(y = elec_avg, colour = "elec_avg"))+
+  geom_point(aes(y = elec_avg))+
+  geom_line(aes(y = dock_avg, colour = "dock_avg"))+
+  geom_point(aes(y = dock_avg))
