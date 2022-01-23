@@ -12,28 +12,36 @@
 #### Installing Packages ####
 
 install.packages("tidyverse")
-library(tidyverse)
 install.packages("dplyr")
-library(dplyr)
 install.packages("ggplot2")
-library(ggplot2)
 install.packages("data.table")
-library(data.table)
 install.packages("scales")
+install.packages("lubridate")
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(data.table)
 library(scales)
+library(lubridate)
 
+#### Import Data Sets ####
+cyclistic <-cyclist_data
 
 #### Format Data class a Data Table ####  
 cyclistic <- as.data.table(cyclist_data)
 
-
-
 #### No. of Rides of Bikers on different Bikes,#### 
   #arranged in High to low counts.
 
-
-cyclistic[, .(total_rides =.N), 
+ribi_rides <- cyclistic[, .(total_rides =.N), 
           by = .(rider_type, bike_type)][order(-total_rides)]
+
+ribi_rides
+
+ggplot(ribi_rides, aes(x = rider_type, y = total_rides, ))+
+  geom_col(fill = "dark blue")+
+  facet_wrap(~ bike_type)+
+  xlab("Riders Type")+ylab("No. of Rides")
 
 
 #### Duration of Bikers on different Bikes (In Hours)####
@@ -42,7 +50,7 @@ cyclistic[, .(total_rides =.N),
 Total_Hrs <- cyclistic[, .(ride_dur_hrs = (sum(ride_length)/60)),
           by = .(rider_type, bike_type)][order(-ride_dur_hrs)]
 
-
+Total_Hrs
 
 #### First and last ride for each rider and bike.####
 
@@ -76,6 +84,11 @@ ggplot(cyclistic, aes(bike_type, fill = rider_type))+
   xlab("Bikes")+ylab("No.of Rides")+
   theme(axis.title = element_text(color = "Blue"))
 
+#### Summary of Total Bike rides and Ride Duration monthly
 
+cyc_mnt <- cyclistic %>% 
+    group_by(Mont_year = format(start_time, "%b%y"), rider_type, bike_type) %>% 
+  summarize(total_rides = n(), ride_length = sum(ride_length),
+            avg_length =  sum(ride_length)/n()) 
 
-
+View(cyc_mnt)
